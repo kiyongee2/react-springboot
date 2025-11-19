@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import api from "../api/api";
 import dayjs from "dayjs";
@@ -7,6 +7,8 @@ const BookDeatail = () => {
   const { id } = useParams(); // URL 파라미터에서 도서 ID 추출
   const [book, setBook] = useState({}); // 도서 정보 상태
   const navigate = useNavigate(); // 페이지 이동 훅
+  const location = useLocation();
+  const { page = 0, keyword = "", type = "all" } = location.state || {};
 
   // 도서 상세 정보 불러오기
   useEffect(() => {
@@ -35,7 +37,11 @@ const BookDeatail = () => {
           </p>
         )}
       </div>
-      <button onClick={() => navigate("/")}>목록으로</button>
+        <button 
+          onClick={() => navigate("/", { state: { page, keyword, type } })}
+        >
+          목록으로
+        </button>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import '../App.css';
 import React, { useEffect, useState } from "react";
 import api from "../api/api";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 const BookList = () => {
   const [books, setBooks] = useState([]);
@@ -9,10 +9,19 @@ const BookList = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [keyword, setKeyword] = useState("");  // 검색어
   const [type, setType] = useState("all");     // 검색 기준 (all/title/author)
-
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // 📌 목록 불러오기 (검색 + 페이징)
+  // 전달된 상태가 있으면 그 값을 사용
+  useEffect(() => {
+    if (location.state) {
+      if (location.state.page !== undefined) setPage(location.state.page);
+      if (location.state.keyword !== undefined) setKeyword(location.state.keyword);
+      if (location.state.type !== undefined) setType(location.state.type);
+    }
+  }, [location.state]);
+
+  // 목록 불러오기 (검색 + 페이징)
   useEffect(() => {
     const fetchBooks = async () => {
       try {
@@ -28,7 +37,7 @@ const BookList = () => {
     fetchBooks();
   }, [page, keyword, type]);
 
-  // 📌 도서 삭제
+  // 도서 삭제
   const handleDelete = async (id) => {
     if (!window.confirm("정말 삭제하시겠습니까?")) return;
 
@@ -52,7 +61,7 @@ const BookList = () => {
     <div style={{ width: "80%", margin: "0 auto" }}>
       <h1>📚 도서 목록</h1>
 
-      {/* 📌 검색 영역 */}
+      {/* 검색 영역 */}
       <div style={{ marginBottom: "20px" }}>
         <select
           value={type}
@@ -83,7 +92,7 @@ const BookList = () => {
         <button style={{ marginBottom: "20px" }}>+ 도서 등록</button>
       </Link>
 
-      {/* 📌 목록 출력 */}
+      {/* 목록 출력 */}
       {books.length === 0 ? (
         <p>등록된 도서가 없습니다.</p>
       ) : (
@@ -101,12 +110,25 @@ const BookList = () => {
               <tr key={book.id}>
                 <td>{book.id}</td>
                 <td>
-                  <Link to={`/books/${book.id}`}>{book.title}</Link>
+                  <Link
+                    to={`/books/${book.id}`}
+                    state={{ page, keyword, type }}
+                  >
+                    {book.title}
+                  </Link>
                 </td>
                 <td>{book.author}</td>
                 <td>
                   <button onClick={() => handleDelete(book.id)}>삭제</button>
-                  <button onClick={() => navigate(`/books/${book.id}/edit`)}>수정</button>
+                  <button
+                    onClick={() =>
+                      navigate(`/books/${book.id}/edit`, {
+                        state: { page, keyword, type },
+                      })
+                    }
+                  >
+                    수정
+                  </button>
                 </td>
               </tr>
             ))}
@@ -114,7 +136,7 @@ const BookList = () => {
         </table>
       )}
 
-      {/* 📌 페이지 네비게이션 */}
+      {/* 페이지 네비게이션 */}
       <div style={{ marginTop: "20px" }}>
 
         {/* ◀ 이전 */}
