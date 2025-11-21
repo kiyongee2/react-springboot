@@ -7,8 +7,8 @@ const BookList = () => {
   const [books, setBooks] = useState([]);
   const [page, setPage] = useState(0);      // 현재 페이지
   const [totalPages, setTotalPages] = useState(0);
+  const [type, setType] = useState("all");     // 검색 유형 (all/title/author)
   const [keyword, setKeyword] = useState("");  // 검색어
-  const [type, setType] = useState("all");     // 검색 기준 (all/title/author)
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -28,7 +28,7 @@ const BookList = () => {
         const res = await api.get(
           `/books/pages?page=${page}&keyword=${keyword}&type=${type}`
         );
-        setBooks(res.data.content);
+        setBooks(res.data.content); 
         setTotalPages(res.data.totalPages);
       } catch (error) {
         console.error("도서 목록 불러오기 실패:", error);
@@ -49,7 +49,7 @@ const BookList = () => {
       const res = await api.get(
         `/books/pages?page=${page}&keyword=${keyword}&type=${type}`
       );
-      setBooks(res.data.content);
+      setBooks(res.data.content);  //res.data 도 가능
       setTotalPages(res.data.totalPages);
 
     } catch (error) {
